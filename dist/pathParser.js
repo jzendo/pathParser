@@ -1,3 +1,10 @@
+
+/*!
+ * -------------------------------
+ *    Path Parser v1.0.0
+ * -------------------------------
+ */
+
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -119,54 +126,9 @@
     }
   };
 
-  const identStart = '[\$_a-zA-Z]';
-  const identPart = '[\$_a-zA-Z0-9]';
-  const identRegExp = new RegExp('^' + identStart + '+' + identPart + '*' + '$');
-
-  function isIdent(s) {
-    return identRegExp.test(s);
-  }
-
-  function isIndex(s) {
-    return +s === s >>> 0 && s !== '';
-  }
-
-  function formatAccessor(key) {
-    if (isIndex(key)) {
-      return '[' + key + ']';
-    } else {
-      return '["' + key.replace(/"/g, '\\"') + '"]';
-    }
-  }
-
-  function toString(paths) {
-    let pathString = '';
-
-    for (let i = 0; i < paths.length; i++) {
-      const key = paths[i];
-
-      if (isIdent(key)) {
-        pathString += i ? '.' + key : key;
-      } else {
-        pathString += formatAccessor(key);
-      }
-    }
-
-    return pathString;
-  }
-
-  /**
-   * Inspired by https://github.com/Polymer/observe-js.git
-   */
-
   function noop() {}
 
   function parsePath(path) {
-    if (Object.prototype.toString.call(path) === '[object Array]') return path;
-    if (path === null || path === undefined) return []; // Ensure string
-
-    path = String(path);
-    if (path.trim().length === 0) return [];
     var keys = [];
     var index = -1;
     var c,
@@ -235,7 +197,70 @@
     return null; // parse error
   }
 
-  exports.default = parsePath;
+  const identStart = '[\$_a-zA-Z]';
+  const identPart = '[\$_a-zA-Z0-9]';
+  const identRegExp = new RegExp('^' + identStart + '+' + identPart + '*' + '$');
+
+  function isIdent(s) {
+    return identRegExp.test(s);
+  }
+
+  function isIndex(s) {
+    return +s === s >>> 0 && s !== '';
+  }
+
+  function formatAccessor(key) {
+    if (isIndex(key)) {
+      return '[' + key + ']';
+    } else {
+      return '["' + key.replace(/"/g, '\\"') + '"]';
+    }
+  }
+  /**
+   * Get string with parsed result
+   *
+   * @param {Array} paths the parsed result
+   */
+
+
+  function toString(paths) {
+    let pathString = '';
+
+    for (let i = 0; i < paths.length; i++) {
+      const key = paths[i];
+
+      if (isIdent(key)) {
+        pathString += i ? '.' + key : key;
+      } else {
+        pathString += formatAccessor(key);
+      }
+    }
+
+    return pathString;
+  }
+
+  /**
+   * Inspired by https://github.com/Polymer/observe-js.git
+   */
+
+  const cache = new Map();
+
+  function parsePathWithCache(path) {
+    if (Object.prototype.toString.call(path) === '[object Array]') return path;
+    if (path === null || path === undefined) return []; // Ensure string
+
+    path = String(path);
+    if (path.trim().length === 0) return [];
+
+    if (!cache.has(path)) {
+      const paths = parsePath(path);
+      cache.set(path, paths);
+    }
+
+    return cache.get(path);
+  }
+
+  exports.default = parsePathWithCache;
   exports.toString = toString;
 
   Object.defineProperty(exports, '__esModule', { value: true });

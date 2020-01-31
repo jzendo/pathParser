@@ -18,6 +18,11 @@ function formatAccessor(key) {
   }
 }
 
+/**
+ * Get string with parsed result
+ *
+ * @param {Array} paths the parsed result
+ */
 export default function toString(paths) {
   let pathString = ''
   for (let i = 0; i < paths.length; i++) {

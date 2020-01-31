@@ -18,7 +18,11 @@ describe('the path string is', () => {
     assertPath(' ', [], '');
     assertPath(null, [], '');
     assertPath(undefined, [], '');
+
     assertPath('a', ['a'], 'a');
+    // Test cache
+    assertPath('a', ['a'], 'a');
+
     assertPath('a.b', ['a', 'b'], 'a.b');
     assertPath('a. b', ['a', 'b'], 'a.b');
     assertPath('a .b', ['a', 'b'], 'a.b');
@@ -45,6 +49,7 @@ describe('the path string is', () => {
     assertInvalidPath(' . ');
     assertInvalidPath('..');
     assertInvalidPath('a[4');
+    assertInvalidPath('a]');
     assertInvalidPath('a.b.');
     assertInvalidPath('a,b');
     assertInvalidPath('a["foo]');
