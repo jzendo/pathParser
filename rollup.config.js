@@ -18,8 +18,8 @@ export default {
   input: "src/index.js",
   output: [
     {
-      file: "dist/pathParser.esm.js",
-      format: "esm",
+      file: 'dist/pathParser.module.js',
+      format: 'es',
       ...moreOutput
     },
     {
